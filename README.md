@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Face Recognition models comparison
 
 ## Progress so far
@@ -58,3 +59,6 @@ RetinaFace is a cutting-edge, single-stage face detection algorithm that leverag
 **Single Shot MultiBox Detector (SSD)**
 
 It is a popular deep learning model for object detection that prioritizes both accuracy and speed. Unlike two-stage detectors that first propose regions and then classify them, SSD directly predicts bounding box offsets and class probabilities for multiple objects within a single forward pass of a convolutional neural network. It achieves this by using a set of default bounding boxes (priors) of varying scales and aspect ratios across different feature map layers, allowing it to detect objects at various sizes and locations efficiently. Its "single shot" nature makes it well-suited for real-time applications.
+=======
+# My New Project
+>>>>>>> c7b0fa3 (inital commit for FaceNet)
