@@ -1,6 +1,7 @@
 # Face Recognition models comparison
 
 **Multi-task Cascaded Convolutional Networks - mtcnn**
+[Joint Face Detection and Alignment using Multi-task Cascaded Convolutional Networks](https://arxiv.org/pdf/1604.02878)
 
 Multi-task Cascaded Convolutional Networks (MTCNN) is a popular and robust deep learning-based framework primarily used for face detection and facial landmark alignment. It operates in a cascaded three-stage architecture (P-Net, R-Net, O-Net) that progressively refines bounding box proposals and predicts five facial landmarks (eyes, nose, mouth corners) in a coarse-to-fine manner. This multi-task learning approach allows MTCNN to achieve high accuracy in detecting faces even in challenging "in-the-wild" conditions, making it a common choice for the initial stage of many face recognition pipelines.
 
