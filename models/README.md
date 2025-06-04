@@ -1,8 +1,8 @@
 models
--    "VGG-Face",
--    "OpenFace",
--    "DeepFace",
--    "DeepID",
--    "ArcFace",
--    "SFace",
--    "GhostFaceNet",
+-    VGG-Face
+-    OpenFace
+-    DeepFace
+-    DeepID
+-    ArcFace
+-    SFace
+-    GhostFaceNet
