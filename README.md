@@ -1,5 +1,20 @@
 # Face Recognition models comparison
 
+## **Face Recognition Models**
+- VGG-Face
+- Facenet
+- OpenFace
+- DeepFace
+- DeepID
+- ArcFace
+- Dlib
+
+## **Face Detection Models**
+- Opencv
+- mtcnn
+- retinaface
+- ssd
+
 **RetinaFace**
 
 RetinaFace is a cutting-edge, single-stage face detection algorithm that leverages deep learning to accurately identify faces and localize their key facial landmarks (like eyes, nose, and mouth) even in challenging "in-the-wild" conditions. It achieves high performance by combining face box prediction, 2D facial landmark localization, and 3D vertices regression into a unified, efficient framework. Trained on large datasets like WIDER FACE, RetinaFace is widely used in various applications requiring robust and fast face detection.
