@@ -16,6 +16,7 @@
 - ssd
 
 **OpenCV (Open Source Computer Vision Library)**
+
 It is a comprehensive and widely-used open-source library that provides a rich set of tools and functions for computer vision and machine learning tasks. Developed primarily in C++ with interfaces for Python, Java, and MATLAB, OpenCV offers functionalities ranging from basic image and video processing operations (like filtering, transformations, and color manipulation) to more advanced algorithms for object detection, facial recognition, motion tracking, and augmented reality. Its extensive capabilities, cross-platform compatibility, and active community make it an indispensable resource for researchers and developers working in the field of computer vision.
 
 **Multi-task Cascaded Convolutional Networks - mtcnn**
@@ -32,4 +33,5 @@ Multi-task Cascaded Convolutional Networks (MTCNN) is a popular and robust deep 
 RetinaFace is a cutting-edge, single-stage face detection algorithm that leverages deep learning to accurately identify faces and localize their key facial landmarks (like eyes, nose, and mouth) even in challenging "in-the-wild" conditions. It achieves high performance by combining face box prediction, 2D facial landmark localization, and 3D vertices regression into a unified, efficient framework. Trained on large datasets like WIDER FACE, RetinaFace is widely used in various applications requiring robust and fast face detection.
 
 **Single Shot MultiBox Detector (SSD)**
+
 It is a popular deep learning model for object detection that prioritizes both accuracy and speed. Unlike two-stage detectors that first propose regions and then classify them, SSD directly predicts bounding box offsets and class probabilities for multiple objects within a single forward pass of a convolutional neural network. It achieves this by using a set of default bounding boxes (priors) of varying scales and aspect ratios across different feature map layers, allowing it to detect objects at various sizes and locations efficiently. Its "single shot" nature makes it well-suited for real-time applications.
