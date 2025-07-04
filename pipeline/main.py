@@ -98,8 +98,7 @@ async def face_match(
         # 5. Face Matching (Cosine Similarity)
         # InsightFace provides a function for similarity calculation
         similarity_score = np.dot(face_casual, face_id) / (np.linalg.norm(face_casual) * np.linalg.norm(face_id))
-
-        print('\nSIMILARITY',similarity_score,'\n')
+        similarity_score=float(similarity_score)
         
         # You can define a threshold for "matching"
         matching_threshold = 0.5  # This threshold can be fine-tuned based on your specific needs

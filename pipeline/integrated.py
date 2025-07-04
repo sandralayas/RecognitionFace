@@ -1,0 +1,70 @@
+import io
+from typing import List, Dict, Any
+
+import cv2
+import numpy as np
+from fastapi import FastAPI, File, UploadFile, HTTPException, status
+from fastapi.responses import JSONResponse
+
+from insightcode_modified import image_face_embedding,compare_faces
+from imageQuality import preprocessing,find_which_preprocess
+
+
+app = FastAPI(
+    title="InsightFace Face Matching API",
+    description="API for face matching two images (casual and ID) using InsightFace.",
+    version="1.0.0",
+)
+
+async def read_image_from_uploadfile(file: UploadFile) -> np.ndarray:
+    """Reads an image from an UploadFile and converts it to a NumPy array (BGR format)."""
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if img is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Could not decode image from {file.filename}. Please ensure it's a valid image file."
+        )
+    return img
+
+@app.post("/face-match/")
+async def face_match(
+    casual_image: UploadFile = File(..., description="A casual photograph of the person."),
+    id_image: UploadFile = File(..., description="An ID photograph of the person.")
+) -> Dict[str, Any]:
+    try:
+        # 1. Image Preprocessing
+        img_casual = await read_image_from_uploadfile(casual_image)
+        img_id = await read_image_from_uploadfile(id_image)
+        
+        # img_casual=preprocessing(img_casual,find_which_preprocess(img_casual))
+        # img_id=preprocessing(img_id,find_which_preprocess(img_id))
+        
+        embd_casual=image_face_embedding(img_casual)
+        embd_id=image_face_embedding(img_id)
+        
+        similarity = compare_faces(embd_casual,embd_id)
+        similarity_score=float(similarity)
+        # You can define a threshold for "matching"
+        matching_threshold = 0.5  # This threshold can be fine-tuned based on your specific needs
+
+        if similarity_score >= matching_threshold:
+            match_status = "match"
+            message = "Faces match with high confidence."
+        else:
+            match_status = "no_match"
+            message = "Faces do not match based on the set threshold."
+
+        return {
+            "status": match_status,
+            "confidence": similarity_score,
+            "message": message
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )

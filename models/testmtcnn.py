@@ -8,7 +8,7 @@ import numpy as np
 # Replace 'path/to/your/image.jpg' with the actual path to an image file
 # You can use a sample image from the internet or your local machine.
 # For example, if you have 'sample.jpg' in the same directory as your script.
-image_path = 'image.jpg'
+image_path = r"corpus\Abhiram1.PNG"
 try:
     img = cv2.imread(image_path)
     if img is None:

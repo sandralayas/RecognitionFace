@@ -9,7 +9,7 @@ from vizualize import visualize_verification_result
 from imageQuality import illumination_normalization,imgShow
 from detector import feature5
 
-file=open('files.txt','r')
+file=open('similarpairs.txt','r')
 whole=file.read()
 imgpaths=whole.split('\n')
 
