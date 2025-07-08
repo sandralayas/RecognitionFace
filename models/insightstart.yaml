@@ -1,0 +1,39 @@
+name: insightface_env
+channels:
+  - conda-forge # Essential for many scientific packages, including insightface and onnxruntime
+  - defaults    # Standard Anaconda packages
+  # If you specifically need a PyTorch with CUDA for GPU support:
+  # - pytorch
+  # - nvidia # For CUDA toolkit packages from NVIDIA's channel
+
+dependencies:
+  # Python version - choose one compatible with InsightFace (3.8-3.11 are generally safe)
+  - python=3.9
+  
+  # Core scientific/data handling libraries
+  - numpy          # Essential for numerical operations
+  - opencv         # OpenCV for image processing (from conda-forge)
+  - matplotlib     # For plotting and visualization
+  - scikit-image   # Image processing utilities
+  - tqdm           # Progress bars
+
+  # ONNX Runtime (InsightFace's preferred inference backend)
+  # Choose either CPU or GPU version based on your hardware:
+  - onnxruntime    # For CPU-only inference (smaller install)
+  # - onnxruntime-gpu # For GPU inference (requires CUDA/cuDNN setup)
+
+  # InsightFace itself (install from conda-forge directly)
+  # - insightface # This will try to pull the latest stable version from conda-forge
+
+  # Optional: PyTorch for models that might use it (some InsightFace models can be PyTorch-based)
+  # If you install PyTorch, consider if you need the CPU or GPU version.
+  # - pytorch::pytorch=1.13.1 # Example for CPU. Adjust version as needed.
+  # - pytorch::pytorch-cuda=11.7 # Example for CUDA 11.7. Adjust CUDA version to match your system.
+                                # Check PyTorch's official installation guide for precise command.
+
+  # Pip-installed packages (less common for core InsightFace, but can be added if specific ones are needed)
+  - pip
+  - pip:
+    # - some-other-pip-package==1.0.0
+    # Sometimes, insightface might also be available via pip, but conda-forge is generally preferred for consistency
+    - insightface # If you prefer pip install for some reason, ensure onnxruntime is also handled.
