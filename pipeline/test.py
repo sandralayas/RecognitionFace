@@ -5,16 +5,16 @@ import cv2
 from insightcode_modified import get_face_embedding,compare_faces,get_person_age,get_person_gender
 from imageQuality import preprocessing,find_which_preprocess,imgShow
 
-file=open('preprocess.txt','r')
-# file=open('similar.txt','r')
-# file=open('dissimilar.txt','r')
-whole=file.read()
-imgpaths=whole.split('\n')
+# file=open('preprocess.txt','r')
+# # file=open('similar.txt','r')
+# # file=open('dissimilar.txt','r')
+# whole=file.read()
+# imgpaths=whole.split('\n')
 
-# imgpaths=['Divas2.jpg - Divas4.jpg','nikitha1.png - nikitha2.jpg']
+imgpaths=['Divas2.jpg - Divas4.jpg','nikitha1.png - nikitha2.jpg']
 # imgpaths = ['eveena1.jpg - eveena2.jpg']
 # imgpaths = ['test1.jpg - test2.jpg']
-
+# imgpaths = ['alex.png - Divas5.jpg']
 
 '''
 Yellowing/Browning
@@ -38,9 +38,17 @@ for imgpair in imgpaths:
     image1=cv2.imread(image1_path)
     image2=cv2.imread(image2_path)
 
-    # age1=get_person_age(image1)
-    # age2=get_person_age(image2)
-    # print(age1,age2)
+    print(lazypath)
+
+    age1=get_person_age(image1)
+    age2=get_person_age(image2)
+    print(age1,age2)
+    
+    # if get_person_gender(image1)==1:gender1='Male'
+    # elif get_person_gender(image1)==0:gender1='Female'
+    # if get_person_gender(image1)==1:gender2='Male'
+    # elif get_person_gender(image1)==0:gender2='Female'
+    # print(gender1,gender2)
 
     # age
     # if get_person_gender(image1)!=get_person_gender(image2):
