@@ -6,9 +6,9 @@ import numpy as np
 from fastapi import FastAPI, File, UploadFile, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from insightcode_modified import image_face_embedding,compare_faces,get_person_gender
+from insightcode_modified import image_face_embedding,compare_faces,get_person_gender,get_person_age
 from imageQuality import preprocessing,find_which_preprocess
-
+from age_gender_preprocess_function import filtering_preprocess
 
 app = FastAPI(
     title="InsightFace Face Matching API",
@@ -33,28 +33,26 @@ async def face_match(
     casual_image: UploadFile = File(..., description="A casual photograph of the person."),
     id_image: UploadFile = File(..., description="An ID photograph of the person.")
 ) -> Dict[str, Any]:
+    
     try:
         # 1. Image Preprocessing
         img_casual = await read_image_from_uploadfile(casual_image)
         img_id = await read_image_from_uploadfile(id_image)
         
-        # img_casual=preprocessing(img_casual,find_which_preprocess(img_casual))
-        # img_id=preprocessing(img_id,find_which_preprocess(img_id))
+        embd_casual=image_face_embedding(img_casual)
+        embd_id=image_face_embedding(img_id)
         
-        if get_person_gender(img_casual)==get_person_gender(img_id):
-            gendernot=False
+        img_casual=preprocessing(img_casual,find_which_preprocess(img_casual))
+        img_id=preprocessing(img_id,find_which_preprocess(img_id))
         
-        if gendernot:
-            match_status = "no_match"
-            message='The found gender does not match'
-        else:
-            embd_casual=image_face_embedding(img_casual)
-            embd_id=image_face_embedding(img_id)
-            
+        # passed,match_status,message=filtering_preprocess(img_casual,img_id)
+        passed=True
+        
+        if passed:
             similarity = compare_faces(embd_casual,embd_id)
             similarity_score=float(similarity)
-            # You can define a threshold for "matching"
-            matching_threshold = 0.5  # This threshold can be fine-tuned based on your specific needs
+            
+            matching_threshold = 0.4
             
             if similarity_score >= matching_threshold:
                 match_status = "match"
