@@ -45,8 +45,11 @@ for imgpair in imgpaths:
     # print(age1,age2,diff)
     # if age1 and age2 in range(mid-5,mid+5):
     
-    if diff<10:
+    if diff<15:
         count+=1
-    else:pass
+    else:
+        pass
+        # print(lazypath)
+        # imgShow(image1,image2)
 
-print('\nAccurracy :',round(count/total_pairs*100,2),'%\nTotal number of pictures :',total_pairs,'\nNew pictures correct :',count,'\nOld pictures :',total_pairs-count)
+# print('\nAccurracy :',round(count/total_pairs*100,2),'%\nTotal number of pictures :',total_pairs,'\nNew pictures correct :',count,'\nOld pictures :',total_pairs-count)
