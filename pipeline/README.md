@@ -20,7 +20,7 @@
 - DeepFace
 - DeepID
 - **ArcFace**
-- Dlib
+- *Dlib*
 
 ## **Face Detection Models**
 - Opencv
