@@ -1,16 +1,9 @@
 # Face Recognition models comparison
 
 ## **Preprocessing Challenges**
-- Yellowing/Browning
-- Fading (Desaturation)
-- Low Resolution/Sharpness
-- Poor Lighting
-- Outdated Appearance hair
-- Outdated Appearance age
-- Reflections/Glare (from lamination)
-- Posture
-- Blurriness: Motion blur
-- Inconsistent Framing/Composition
+- Poor lighting
+- Age detection filter 
+- Gender Detection Filter 
 
 
 ## **Face Recognition Models**
