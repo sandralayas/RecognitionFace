@@ -2,8 +2,10 @@
 
 ## **Preprocessing Challenges**
 - Poor lighting 
-- Age detection filter 
-- Gender detection filter 
+- Age detection filter
+  - To filter out the ID photo which is older than 15 years
+- Gender Detection Filter
+  - To skip the initial filter
 
 
 ## **Face Recognition Models**
