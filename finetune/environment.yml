@@ -1,0 +1,24 @@
+name: face_api_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9 # You can choose a different Python version like 3.10, 3.11
+  - pip
+  - pytorch::pytorch # For CPU-only PyTorch
+  - pytorch::torchvision # For CPU-only PyTorch
+  # If you have a GPU and CUDA installed, uncomment the following lines and comment the CPU-only lines above:
+  # - pytorch::pytorch=2.3.0 # Example version, adjust as needed
+  # - pytorch::torchvision=0.18.0 # Example version, adjust as needed
+  # - pytorch::cudatoolkit=11.8 # Example CUDA version, match your system's CUDA
+  - pip:
+    - fastapi
+    - uvicorn[standard]
+    - insightface==0.7.0 # Specify a compatible version, check InsightFace's documentation for the latest stable
+    - onnxruntime # For CPU execution with InsightFace
+    # If using GPU, you might need onnxruntime-gpu instead:
+    # - onnxruntime-gpu
+    - opencv-python # Often a dependency for image processing
+    - numpy
+    - python-multipart
