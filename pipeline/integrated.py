@@ -1,3 +1,5 @@
+# uvicorn integrated:app --reload
+
 import io
 from typing import List, Dict, Any
 
@@ -39,9 +41,27 @@ async def face_match(
         img_casual = await read_image_from_uploadfile(casual_image)
         img_id = await read_image_from_uploadfile(id_image)
 
+        # Example Pipeline (adjust as needed for your specific model):
+        # target_size = (224, 224)
+
+        # # --- PREPROCESS CASUAL IMAGE ---
+        # preprocessed_casual = cv2.resize(img_casual, target_size)
+        # preprocessed_casual = cv2.cvtColor(preprocessed_casual, cv2.COLOR_BGR2RGB) # BGR -> RGB
+        # preprocessed_casual = preprocessed_casual.astype(np.float32) / 255.0      # Normalize to 0-1
+        
+        # # --- PREPROCESS ID IMAGE ---
+        # preprocessed_id = cv2.resize(img_id, target_size)
+        # preprocessed_id = cv2.cvtColor(preprocessed_id, cv2.COLOR_BGR2RGB)       # BGR -> RGB
+        # preprocessed_id = preprocessed_id.astype(np.float32) / 255.0            # Normalize to 0-1
+
+        # no preprocess
+        # img_casual_preprocessed = img_casual
+        # img_id_preprocessed = img_id
+        
         # Apply general preprocessing for face embedding and quality checks
         img_casual_preprocessed = preprocessing(img_casual, find_which_preprocess(img_casual))
         img_id_preprocessed = preprocessing(img_id, find_which_preprocess(img_id))
+
 
         # Perform age and gender filtering first
         passed_filter, filter_match_status, filter_message = filtering_preprocess(img_casual_preprocessed, img_id_preprocessed)

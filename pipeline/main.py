@@ -1,29 +1,34 @@
+# app.py
+# uvicorn main:app --reload 
+
 import io
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, UploadFile, HTTPException, status
-from fastapi.responses import JSONResponse
-from insightface.app import FaceAnalysis
+from fastapi import FastAPI, File, UploadFile, HTTPException, status, Request
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
+# Assuming these modules are in your project directory
+# from insightcode_modified import image_face_embedding, compare_faces
+from fintuned_model import image_face_embedding, compare_faces
+from imageQuality import preprocessing, find_which_preprocess
+from age_gender_preprocess_function import filtering_preprocess
+import time
+
+# Set up FastAPI
 app = FastAPI(
     title="InsightFace Face Matching API",
     description="API for face matching two images (casual and ID) using InsightFace.",
     version="1.0.0",
 )
 
-# Initialize InsightFace model globally for efficiency
-# 'buffalo_l' is a commonly used model for face recognition.
-# You might need to download the model if it's not present locally (~/.insightface/models)
-# The first time you run this, InsightFace might download the model.
-
-try:
-    face_app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
-    face_app.prepare(ctx_id=0, det_size=(640, 640))
-except Exception as e:
-    raise RuntimeError(f"Failed to load InsightFace model: {e}. "
-                       "Ensure the 'buffalo_l' model is available or downloaded.")
+# This assumes your HTML file is in a 'static' directory
+# Create a folder named 'static' and save the HTML file inside it
+BASE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 async def read_image_from_uploadfile(file: UploadFile) -> np.ndarray:
     """Reads an image from an UploadFile and converts it to a NumPy array (BGR format)."""
@@ -42,78 +47,64 @@ async def face_match(
     casual_image: UploadFile = File(..., description="A casual photograph of the person."),
     id_image: UploadFile = File(..., description="An ID photograph of the person.")
 ) -> Dict[str, Any]:
-    """
-    Performs face matching between a casual image and an ID image.
 
-    Args:
-        casual_image (UploadFile): The casual image file.
-        id_image (UploadFile): The ID image file.
-
-    Returns:
-        Dict[str, Any]: A dictionary containing matching status, confidence score, and messages.
-    """
     try:
-        # 1. Image Preprocessing
+        # 1. Read the images as NumPy arrays
         img_casual = await read_image_from_uploadfile(casual_image)
         img_id = await read_image_from_uploadfile(id_image)
-
-        # 2. Face Detection for casual image
-        faces_casual = face_app.get(img_casual)
-        if not faces_casual:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="No face detected in the casual image."
-            )
-        if len(faces_casual) > 1:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "multiple_faces_casual",
-                         "message": "Multiple faces detected in the casual image. Please provide an image with a single clear face.",
-                         "confidence": None}
-            )
-        face_casual = faces_casual[0].embedding
-
-        # 3. Face Detection for ID image
-        faces_id = face_app.get(img_id)
-        if not faces_id:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="No face detected in the ID image."
-            )
-        if len(faces_id) > 1:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "multiple_faces_id",
-                         "message": "Multiple faces detected in the ID image. Please provide an image with a single clear face.",
-                         "confidence": None}
-            )
-        face_id = faces_id[0].embedding
-
-        # 4. Face Embedding Extraction (InsightFace does this as part of `get()` and stores in face.embedding)
-        # embedding_casual = face_casual.embedding
-        # embedding_id = face_id.embedding
-
-        # print('embedding_casual',embedding_casual,'\nembedding_id',embedding_id)
         
-        # 5. Face Matching (Cosine Similarity)
-        # InsightFace provides a function for similarity calculation
-        similarity_score = np.dot(face_casual, face_id) / (np.linalg.norm(face_casual) * np.linalg.norm(face_id))
-        similarity_score=float(similarity_score)
+        if img_casual is None or img_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="One or both images could not be processed."
+            )
+
+        start_time = time.time()
+        # 2. Apply preprocessing for face quality and embeddings
+        #    NOTE: This is the critical step to ensure consistency.
+        #    The preprocessing must happen BEFORE getting embeddings.
+        img_casual_preprocessed = preprocessing(img_casual, find_which_preprocess(img_casual))
+        img_id_preprocessed = preprocessing(img_id, find_which_preprocess(img_id))
         
-        # You can define a threshold for "matching"
-        matching_threshold = 0.5  # This threshold can be fine-tuned based on your specific needs
+        # 3. Perform age and gender filtering
+        passed_filter, filter_match_status, filter_message = filtering_preprocess(img_casual_preprocessed, img_id_preprocessed)
+
+        end_time = time.time()
+        
+        if not passed_filter:
+            return {
+                "filter":passed_filter,
+                "status": filter_match_status,
+                "confidence": 0.0,
+                "message": filter_message,
+                "time": end_time-start_time
+            }
+
+        # 4. If filters pass, get embeddings from the PREPROCESSED images
+        embd_casual = image_face_embedding(img_casual_preprocessed)
+        embd_id = image_face_embedding(img_id_preprocessed)
+
+        # 5. Compare the face embeddings
+        similarity = compare_faces(embd_casual, embd_id)
+        similarity_score = float(similarity)
+
+        matching_threshold = 0.4
 
         if similarity_score >= matching_threshold:
             match_status = "match"
-            message = "Faces match with high confidence."
+            message = "Faces match with high confidence and passed age/gender checks."
         else:
             match_status = "no_match"
-            message = "Faces do not match based on the set threshold."
+            message = "Faces do not match based on the set threshold, but passed age/gender checks."
 
+        end_time = time.time()
+        
         return {
+            "filter":passed_filter,
             "status": match_status,
             "confidence": similarity_score,
-            "message": message
+            "message": message,
+            "time": end_time-start_time
         }
 
     except HTTPException as e:
@@ -123,8 +114,12 @@ async def face_match(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {str(e)}"
         )
+        
 
-# Optional: Root endpoint for health check
-@app.get("/")
-async def read_root():
-    return {"message": "InsightFace Face Matching API is running!"}
+# New endpoint to serve the UI
+@app.get("/", response_class=HTMLResponse)
+async def serve_ui():
+    """Serves the HTML UI for the face-matching tool."""
+    with open("static/index.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
