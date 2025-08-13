@@ -31,16 +31,31 @@ BASE_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 async def read_image_from_uploadfile(file: UploadFile) -> np.ndarray:
-    """Reads an image from an UploadFile and converts it to a NumPy array (BGR format)."""
-    contents = await file.read()
-    nparr = np.frombuffer(contents, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    if img is None:
+    """
+    Reads an image from an UploadFile and converts it to a NumPy array (BGR format).
+    Uses a memory-efficient approach with BytesIO.
+    """
+    try:
+        # Read the file contents into a BytesIO object for memory efficiency
+        contents = await file.read()
+        file_bytes = io.BytesIO(contents)
+
+        # Convert the file bytes into a numpy array
+        nparr = np.frombuffer(file_bytes.getbuffer(), np.uint8)
+
+        # Decode the image from the numpy array in color
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        if img is None:
+            raise ValueError("Could not decode image.")
+
+        return img
+
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Could not decode image from {file.filename}. Please ensure it's a valid image file."
+            detail=f"Error processing image from {file.filename}: {e}"
         )
-    return img
 
 @app.post("/face-match/")
 async def face_match(
@@ -63,8 +78,11 @@ async def face_match(
         # 2. Apply preprocessing for face quality and embeddings
         #    NOTE: This is the critical step to ensure consistency.
         #    The preprocessing must happen BEFORE getting embeddings.
-        img_casual_preprocessed = preprocessing(img_casual, find_which_preprocess(img_casual))
-        img_id_preprocessed = preprocessing(img_id, find_which_preprocess(img_id))
+        # img_casual_preprocessed = preprocessing(img_casual, find_which_preprocess(img_casual))
+        # img_id_preprocessed = preprocessing(img_id, find_which_preprocess(img_id))
+        
+        img_casual_preprocessed =img_casual
+        img_id_preprocessed = img_id
         
         # 3. Perform age and gender filtering
         passed_filter, filter_match_status, filter_message = filtering_preprocess(img_casual_preprocessed, img_id_preprocessed)
@@ -75,9 +93,9 @@ async def face_match(
             return {
                 "filter":passed_filter,
                 "status": filter_match_status,
-                "confidence": 0.0,
+                "confidence": '0 %',
                 "message": filter_message,
-                "time": end_time-start_time
+                "time": str(round(end_time-start_time,2))+' seconds'
             }
 
         # 4. If filters pass, get embeddings from the PREPROCESSED images
@@ -102,9 +120,9 @@ async def face_match(
         return {
             "filter":passed_filter,
             "status": match_status,
-            "confidence": similarity_score,
+            "confidence": str(round(similarity_score,2)*100)+' %',
             "message": message,
-            "time": end_time-start_time
+            "time": str(round(end_time-start_time,2))+' seconds'
         }
 
     except HTTPException as e:
