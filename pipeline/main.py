@@ -106,7 +106,7 @@ async def face_match(
         similarity = compare_faces(embd_casual, embd_id)
         similarity_score = float(similarity)
 
-        matching_threshold = 0.4
+        matching_threshold = 0.6
 
         if similarity_score >= matching_threshold:
             match_status = "match"
