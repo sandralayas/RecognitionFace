@@ -11,7 +11,9 @@ from insightface.app import FaceAnalysis
 import time
 import math
 
-app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])  # Use 'CUDAExecutionProvider' for GPU
+# Initialize the InsightFace model
+app = FaceAnalysis(root='/root/app', providers=['CPUExecutionProvider'])
+# app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])  # Use 'CUDAExecutionProvider' for GPU
 app.prepare(ctx_id=-1)  # ctx_id=-1 for CPU, 0 for GPU
 
 def image_face_embedding(image_cv):
