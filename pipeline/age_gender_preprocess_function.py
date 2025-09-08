@@ -6,61 +6,50 @@ import numpy as np
 from fastapi import FastAPI, File, UploadFile, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from insightcode_modified import image_face_embedding,compare_faces,get_person_gender,get_person_age
+from insightcode_modified import crop_face,get_person_gender,get_person_age
 from imageQuality import preprocessing,find_which_preprocess
 
-def filtering_preprocess(img_casual,img_id):
+def filtering_preprocess(img_casual, img_id):
+    """
+    Applies preprocessing filters to two images and checks for age/gender consistency.
+    """
+    # 1. Process and filter the casual image
+    cropped_casual = crop_face(img_casual)
+    if cropped_casual is None:
+        return False, "no_match", "No face detected in the casual image."
 
-    age1=get_person_age(img_casual)
-    age2=get_person_age(img_id)
+    # 2. Process and filter the ID image
+    cropped_id = crop_face(img_id)
+    if cropped_id is None:
+        return False, "no_match", "No face detected in the ID image."
 
-    diff=max(age1,age2)-min(age1,age2)
+    # 3. Check for image quality
+    for cropped_img in [cropped_casual, cropped_id]:
+        image_defect = find_which_preprocess(cropped_img)
+        if image_defect != 'normal':
+            message = f"Poor image quality detected: {image_defect}."
+            return False, "no_match", message
 
-    if diff >= 10: # Changed condition to diff >= 15 as per common age difference thresholds.
-                  # Your original code had diff < 15, which would mean it returns False if the difference is small.
-                  # Assuming you want to flag if the age difference is too *large*.
-                  # If you intended to flag *small* differences, keep diff < 15.
-        match_status = "no_match"
-        message='The detected ages differ significantly.' # Corrected message
-        return False,match_status,message
+    # 4. Perform age and gender checks
+    age1 = get_person_age(img_casual)
+    age2 = get_person_age(img_id)
 
-    if get_person_gender(img_casual)!=get_person_gender(img_id):
-        match_status = "no_match"
-        message='The detected genders do not match.' # Corrected message
-        return False,match_status,message
+    # Add a safety check in case get_person_age returns None
+    if age1 is None or age2 is None:
+        return False, "no_match", "Failed to determine age from one or both images."
 
-    match_status = "match"
-    message='The detected age and gender pass initial filtering.' # Corrected message
-    return True,match_status,message
-'-------------------------------------------------------------------------------------------------'
-# import io
-# from typing import List, Dict, Any
+    diff = abs(age1 - age2)
 
-# import cv2
-# import numpy as np
-# from fastapi import FastAPI, File, UploadFile, HTTPException, status
-# from fastapi.responses import JSONResponse
+    if diff >= 15:
+        message = 'The detected ages differ significantly.'
+        return False, "no_match", message
 
-# from insightcode_modified import image_face_embedding,compare_faces,get_person_gender,get_person_age
-# from imageQuality import preprocessing,find_which_preprocess
+    gender1 = get_person_gender(img_casual)
+    gender2 = get_person_gender(img_id)
 
-# def filtering_preprocess(img_casual,img_id):
+    if gender1 != gender2:
+        message = 'The detected genders do not match.'
+        return False, "no_match", message
 
-#     if get_person_gender(img_casual)!=get_person_gender(img_id):
-#         match_status = "no_match"
-#         message='The found gender does not match'
-#         return False,match_status,message
-
-#     age1=get_person_age(img_casual)
-#     age2=get_person_age(img_id)
-
-#     diff=max(age1,age2)-min(age1,age2)
-
-#     if diff<15:
-#         match_status = "no_match"
-#         message='The found gender does not match'
-#         return False,match_status,message
-
-#     match_status = "match"
-#     message='The passed age and filter'
-#     return True,match_status,message
+    # 5. All checks passed
+    return True, "match", "The detected age and gender pass initial filtering."
