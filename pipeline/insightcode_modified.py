@@ -12,8 +12,8 @@ import time
 import math
 
 # Initialize the InsightFace model
-app = FaceAnalysis(root='/root/app', providers=['CPUExecutionProvider'])
-# app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])  # Use 'CUDAExecutionProvider' for GPU
+# app = FaceAnalysis(root='/root/app', providers=['CPUExecutionProvider'])
+app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])  # Use 'CUDAExecutionProvider' for GPU
 app.prepare(ctx_id=-1)  # ctx_id=-1 for CPU, 0 for GPU
 
 def image_face_embedding(image_cv):
@@ -29,6 +29,25 @@ def image_face_embedding(image_cv):
     if len(faces) > 1:
         print("Warning: Multiple faces detected. Using first detected face")
     return faces[0].embedding
+
+def crop_face(image_cv):
+    """Crop the face from an image cv format"""
+    img = image_cv
+    # if img is None:
+    #     raise ValueError(f"Could not read image")
+    
+    faces = app.get(img)
+    
+    if len(faces) < 1:
+        return img
+    if len(faces) > 1:
+        return img
+    
+    bbox = faces[0].bbox.astype(int)
+    x1, y1, x2, y2 = bbox
+    cropped_face = img[y1:y2, x1:x2]
+    
+    return cropped_face
 
 def get_person_gender(image):
     faces = app.get(image)
