@@ -9,17 +9,14 @@ def find_which_preprocess(image):
 
     average_intensity = np.mean(gray_image)
 
-    high_brightness_threshold = 180
+    high_brightness_threshold = 200
     low_brightness_threshold = 70
 
-    laplacian_variance = cv2.Laplacian(gray_image, cv2.CV_64F).var()
-    blur_threshold = 100
 
     if average_intensity > high_brightness_threshold or average_intensity < low_brightness_threshold:
-        return 'brightness'
-    
-    elif laplacian_variance < blur_threshold:
-        return 'low_resolution_sharpness'
+        return 'uneven brightness'
+
+    return 'normal'
     
 def preprocessing(image, method='low_resolution_sharpness'):
     processed_image = image.copy()
