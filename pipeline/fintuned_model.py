@@ -9,8 +9,8 @@ import torch.nn as nn
 from torchvision import transforms
 
 # the url download error fix
-insightface.model_zoo.set_model_path('/app')
-model = insightface.model_zoo.get_model('buffalo_l')
+# insightface.model_zoo.set_model_path('/app')
+# model = insightface.model_zoo.get_model('buffalo_l')
 
 # --- Your fine-tuned model architecture ---
 # You need to define the model architecture that matches the one
@@ -46,8 +46,8 @@ except Exception as e:
     fine_tuned_age_model = None
 
 # Your existing insightface app setup
-app = FaceAnalysis(root='/root/app', providers=['CPUExecutionProvider'])
-# app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
+# app = FaceAnalysis(root='/root/app', providers=['CPUExecutionProvider'])
+app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
 app.prepare(ctx_id=-1)
 
 # --- The modified get_person_age function ---
@@ -101,7 +101,7 @@ def get_person_gender(image):
         estimated_gender = main_face.gender
     return estimated_gender
 
-def compare_faces(emb1, emb2, threshold=0.65):
+def compare_faces(emb1, emb2):
     similarity = np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
     return similarity
 
