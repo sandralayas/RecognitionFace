@@ -1,7 +1,8 @@
 fastapi
-uvicorn[standard]
+uvicorn
 python-multipart
 insightface
 opencv-python
 onnxruntime
-numpy
+# torch
+# torchvision
