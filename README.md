@@ -1,7 +1,7 @@
 # Face Recognition models comparison
 
 ## **Preprocessing Challenges**
-- Poor lighting
+- Poor lighting filter 
 - Age detection filter
   - To filter out the ID photo which is older than 15 years
 - Gender Detection Filter
