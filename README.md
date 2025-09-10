@@ -1,5 +1,7 @@
 # Face Recognition models comparison
 
+## progress so far 
+
 ## **Preprocessing Challenges**
 - Poor lighting filter 
 - Age detection filter
