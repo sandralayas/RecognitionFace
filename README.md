@@ -1,6 +1,19 @@
 # Face Recognition models comparison
 
-## progress so far 
+## Progress so far
+- Face Recognition model Comparison 
+- Face Detection Model Comparison
+- Face Match base code
+- Gender detection filter 
+- Age detection filter 
+- Age detection fine-tuning 
+- Face Match Final code 
+- Project Presentation 
+- Local host Docker Deployment 
+- Pixel Service Docker Deployment
+- Logging and Monitor Memory leaks
+- QA testing Repository Creation 
+- QA testing and Initial Deployment 
 
 ## **Preprocessing Challenges**
 - Poor lighting filter 
