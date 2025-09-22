@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Match API UI</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        h1 { text-align: center; }
+        .form-container { border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        .file-input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="file"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        #loading-message { text-align: center; color: #007bff; margin-top: 15px; display: none; }
+        #result-container { margin-top: 20px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; background-color: #f9f9f9; }
+        #result-container h3 { margin-top: 0; }
+        pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .match { color: green; font-weight: bold; }
+        .no-match { color: red; font-weight: bold; }
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>InsightFace Face Matching Tool</h1>
+    <div class="form-container">
+        <p>Upload a casual image and an ID image to check for a match.</p>
+        <form id="faceMatchForm">
+            <div class="file-input-group">
+                <label for="casual_image">Casual Image</label>
+                <input type="file" id="casual_image" name="casual_image" accept="image/*" required>
+            </div>
+            <div class="file-input-group">
+                <label for="id_image">ID Image</label>
+                <input type="file" id="id_image" name="id_image" accept="image/*" required>
+            </div>
+            <button type="submit">Check Match</button>
+        </form>
+    </div>
+    
+    <div id="loading-message">Processing... Please wait.</div>
+
+    <div id="result-container" style="display:none;">
+        <h3>API Response</h3>
+        <pre id="response-json"></pre>
+    </div>
+
+    <script>
+        const form = document.getElementById('faceMatchForm');
+        const loadingMessage = document.getElementById('loading-message');
+        const resultContainer = document.getElementById('result-container');
+        const responseJson = document.getElementById('response-json');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            loadingMessage.style.display = 'block';
+            resultContainer.style.display = 'none';
+            responseJson.textContent = '';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/face-match/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                loadingMessage.style.display = 'none';
+                resultContainer.style.display = 'block';
+
+                responseJson.textContent = JSON.stringify(result, null, 2);
+
+                if (result.status === 'match') {
+                    responseJson.classList.add('match');
+                    responseJson.classList.remove('no-match');
+                } else if (result.status === 'no_match') {
+                    responseJson.classList.add('no-match');
+                    responseJson.classList.remove('match');
+                } else {
+                    responseJson.classList.remove('match', 'no-match');
+                }
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                resultContainer.style.display = 'block';
+                responseJson.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
