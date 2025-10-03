@@ -55,7 +55,7 @@ def encode_images_in_folder(input_folder, output_folder):
 
 # --- SCRIPT USAGE ---
 # Define the input and output folders
-input_folder_path = r"C:\Users\sandr\Documents\database\People"  # Change this to your folder name
+input_folder_path = r"C:\Users\sandr\Documents\pix\FaceRec\corpus"  # Change this to your folder name
 output_folder_path = r"C:\Users\sandr\Documents\database\base64imagecorpus"
 
 # Run the function
